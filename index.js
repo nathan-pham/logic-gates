@@ -1,14 +1,24 @@
-const print = (...args) => console.log(...args)
+const atoms = require("./atoms")
+const test = require("./test")
 
-const not = (bit) => 1 - bit
+// atoms contain "elemental", base circuits
 
-const and = (...bits) => 
-  bits.reduce((acc, cur) => acc * cur)
+// custom xor circuit 
+// see: https://vlsiuniverse.blogspot.com/2016/10/xor-using-nand.html
+const custom_xor = (a, b) => (
+  atoms.nand(
+    atoms.nand(atoms.not(a), b),
+    atoms.nand(a, atoms.not(b))
+  )
+)
 
-const or = (...bits) => 
-  Math.min(Math.max(bits.reduce((acc, cur) => acc + cur), 0), 1)
+// xor truth table (test function also accepts "atoms.xor" instead of an expected value)
+const truth_table = [
+  [[0, 0], atoms.xor],
+  [[0, 1], 1],
+  [[1, 0], 1],
+  [[1, 1], 0]
+]
 
-const xor = (a, b) => and(nand(a, b), or(a, b))
-
-const nand = (...bits) => not(and(...bits))
-const nor = (...bits) => not(or(...bits))
+// test custom circuit
+test(truth_table, custom_xor)
